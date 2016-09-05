@@ -7,9 +7,6 @@ class Guillotine extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      scale: 1,
-    };
     this.boundWheel = this.handleWheel.bind(this);
     this.boundMouseDown = this.handleMouseDown.bind(this);
     this.boundMouseMove = this.handleMouseMove.bind(this);
