@@ -1,0 +1,23 @@
+.react-guillotine-holder {
+    border: 1px dashed blue;
+    margin: 10px;
+}
+
+.react-guillotine-window {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    cursor: move;
+    cursor: -webkit-grab;
+}
+
+.react-guillotine-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    text-align: center;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
