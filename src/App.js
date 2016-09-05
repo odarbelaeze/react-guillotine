@@ -14,7 +14,7 @@ class App extends Component {
           alt="Something"
         />
         <Guillotine
-          src='http://placehold.it/600x200'
+          src='http://fillmurray.com/600/300'
           width={300}
           height={250}
           alt="Narrow"

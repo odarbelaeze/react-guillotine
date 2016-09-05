@@ -7,17 +7,23 @@ class Guillotine extends Component {
 
   constructor(props) {
     super(props);
+    this.state = {};
     this.boundWheel = this.handleWheel.bind(this);
     this.boundMouseDown = this.handleMouseDown.bind(this);
     this.boundMouseMove = this.handleMouseMove.bind(this);
     this.boundMouseUp = this.handleMouseUp.bind(this);
   }
 
-  getEvents() {
+  localEvents() {
     return {
       wheel: this.boundWheel,
       mousedown: this.boundMouseDown,
       touchstart: this.boundMouseDown,
+    }
+  }
+
+  globalEvents() {
+    return {
       mousemove: this.boundMouseMove,
       touchmove: this.boundMouseMove,
       touchend: this.boundMouseUp,
@@ -27,14 +33,20 @@ class Guillotine extends Component {
 
   componentDidMount() {
     this.refs.image.onload = this.initImage.bind(this);
-    _.each(this.getEvents(), (listener, event) => {
+    _.each(this.localEvents(), (listener, event) => {
       this.refs.window.addEventListener(event, listener);
+    });
+    _.each(this.globalEvents(), (listener, event) => {
+      window.addEventListener(event, listener);
     });
   }
 
   componentWillUnmount() {
-    _.each(this.getEvents, (listener, event) => {
+    _.each(this.localEvents, (listener, event) => {
       this.refs.window.removeEventListener(event, listener);
+    });
+    _.each(this.globalEvents(), (listener, event) => {
+      window.removeEventListener(event, listener);
     });
   }
 
@@ -80,6 +92,8 @@ class Guillotine extends Component {
       widthRatio: naturalWidth / width,
       heightRatio: naturalHeight / height,
       scale: minScale,
+      maxX: naturalWidth * minScale - this.props.width,
+      maxY: naturalHeight * minScale - this.props.height,
       x: 0.5 * (naturalWidth * minScale - width),
       y: 0.5 * (naturalHeight * minScale - height),
     });
@@ -101,6 +115,13 @@ class Guillotine extends Component {
       maxY
     );
     return { scale, maxX, maxY, x, y, };
+  }
+
+  pan(dx, dy) {
+    this.setState({
+      x: this._clip(this.state.x + dx, 0, this.state.maxX),
+      y: this._clip(this.state.y + dy, 0, this.state.maxY),
+    });
   }
 
   zoomIn() {
@@ -126,7 +147,11 @@ class Guillotine extends Component {
   handleMouseMove(evt) {
     if (this.state.panning) {
       evt.preventDefault();
-      console.log(evt);
+      this.pan(
+        this.state.panningFrom.clientX - evt.clientX,
+        this.state.panningFrom.clientY - evt.clientY,
+      )
+      this.setState({ panningFrom: evt });
     }
   }
 
@@ -160,10 +185,10 @@ class Guillotine extends Component {
    * Helpers
    */
   _clip(val, min = null, max = null) {
-    let newVal = val;
-    if (min) newVal = newVal > min? newVal : min;
-    if (max) newVal = newVal < max? newVal : max;
-    return newVal;
+    if ((min !== null) && (min === max)) return min;
+    if ((min !== null) && (val < min)) return min;
+    if ((max !== null) && (val > max)) return max;
+    return val;
   }
 }
 
