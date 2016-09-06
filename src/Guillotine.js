@@ -91,8 +91,8 @@ class Guillotine extends Component {
     scale = scale ? this._clip(scale, minScale) : minScale;
     let maxX = naturalWidth * scale - width;
     let maxY = naturalHeight * scale - height;
-    x = x ? this._clip(x, 0, maxX) : 0.5 * (naturalWidth * scale - width);
-    y = y ? this._clip(y, 0, maxY) : 0.5 * (naturalHeight * scale - height);
+    x = x !== undefined ? this._clip(x, 0, maxX) : 0.5 * (naturalWidth * scale - width);
+    y = y !== undefined ? this._clip(y, 0, maxY) : 0.5 * (naturalHeight * scale - height);
     this.setState({
       minScale,
       naturalWidth,
@@ -229,14 +229,6 @@ Guillotine.propTypes = {
    * zoom in and out. Requires font awesome.
    */
   showCropControls: React.PropTypes.bool,
-}
-
-Guillotine.defaultProps = {
-  crop: {
-    scale: 1,
-    x: 0,
-    y: 0,
-  },
 }
 
 export default Guillotine;
