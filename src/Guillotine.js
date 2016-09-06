@@ -72,7 +72,7 @@ class Guillotine extends Component {
               <button className='react-guillotine-control' onClick={this.zoomIn.bind(this)}>
                 <i className='fa fa-plus-circle' aria-hidden='true'></i>
               </button>
-              <button className='crop-control' onClick={this.zoomOut.bind(this)}>
+              <button className='react-guillotine-control' onClick={this.zoomOut.bind(this)}>
                 <i className='fa fa-minus-circle' aria-hidden='true'></i>
               </button>
             </div>

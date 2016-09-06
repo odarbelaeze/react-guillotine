@@ -19,6 +19,7 @@ class App extends Component {
             src='http://beerhold.it/800/600'
             crop={{ width: 250, height: 400, scale: 3, }}
             alt="Narrow"
+            showOverlay
           />
         </div>
         <div className='react-guillotine-holder' style={{width: 300, height: 300}}>
@@ -27,6 +28,7 @@ class App extends Component {
             crop={{ width: 600, height: 600, }}
             alt="Square"
             onChange={console.log}
+            showCropControls
           />
         </div>
       </div>
