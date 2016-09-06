@@ -53,45 +53,65 @@ class Guillotine extends Component {
     });
   }
 
-  componentWillReceiveProps() {
-    this.setState(this.props.data);
+  componentWillReceiveProps(nextProps) {
+    // this.setState(this.props.crop);
   }
 
   render() {
     return (
-      <ImageCrop
-        crop={this.getCrop()}
-        onImageLoad={this.boundInitImage}
-        ref='crop'
-        {...this.props}
-      />
+      <div className='guillotine-container'>
+        <ImageCrop
+          {...this.props}
+          crop={this.getCrop()}
+          onImageLoad={this.boundInitImage}
+          ref='crop'
+        />
+        {
+          this.props.showCropControls && (
+            <div className='react-guillotine-controls'>
+              <button className='react-guillotine-control' onClick={this.zoomIn.bind(this)}>
+                <i className='fa fa-plus-circle' aria-hidden='true'></i>
+              </button>
+              <button className='crop-control' onClick={this.zoomOut.bind(this)}>
+                <i className='fa fa-minus-circle' aria-hidden='true'></i>
+              </button>
+            </div>
+          )
+        }
+      </div>
     );
   }
 
   initImage(image, cropWindow) {
     let { naturalWidth, naturalHeight } = image;
-    let { width, height } = this.props;
+    let { width, height, scale, x, y } = this.props.crop;
     let minWidthScale = width / naturalWidth;
     let minHeightScale = height / naturalHeight;
     let minScale = minWidthScale > minHeightScale? minWidthScale : minHeightScale;
+    scale = scale ? this._clip(scale, minScale) : minScale;
+    let maxX = naturalWidth * scale - width;
+    let maxY = naturalHeight * scale - height;
+    x = x ? this._clip(x, 0, maxX) : 0.5 * (naturalWidth * scale - width);
+    y = y ? this._clip(y, 0, maxY) : 0.5 * (naturalHeight * scale - height);
     this.setState({
       minScale,
       naturalWidth,
       naturalHeight,
+      scale,
+      maxX,
+      maxY,
+      x,
+      y,
       clientScale: width / cropWindow.clientWidth,
-      scale: minScale,
-      maxX: naturalWidth * minScale - this.props.width,
-      maxY: naturalHeight * minScale - this.props.height,
-      x: 0.5 * (naturalWidth * minScale - width),
-      y: 0.5 * (naturalHeight * minScale - height),
     });
+    this.report();
   }
 
   newScale(factor) {
     let {minScale} = this.state;
     let scale = this._clip(this.state.scale * factor, minScale);
-    let maxX = this.state.naturalWidth * scale - this.props.width;
-    let maxY = this.state.naturalHeight * scale - this.props.height;
+    let maxX = this.state.naturalWidth * scale - this.props.crop.width;
+    let maxY = this.state.naturalHeight * scale - this.props.crop.height;
     let x = this._clip(
       this.state.x + this.state.naturalWidth * (scale - this.state.scale) / 2,
       0,
@@ -158,14 +178,14 @@ class Guillotine extends Component {
       scale: this.state.scale,
       x: this.state.x,
       y: this.state.y,
-      width: this.props.width,
-      height: this.props.height,
+      width: this.props.crop.width,
+      height: this.props.crop.height,
     }
   }
 
   report() {
     if (this.props.onChange) {
-      this.props.onChange(this.props.getCrop());
+      this.props.onChange(this.getCrop());
     }
   }
 
@@ -181,30 +201,41 @@ class Guillotine extends Component {
 }
 
 Guillotine.propTypes = {
+   /**
+   * `src`: The image source url.
+   */
   src: React.PropTypes.string.isRequired,
-  width: React.PropTypes.number.isRequired,
-  height: React.PropTypes.number.isRequired,
+  /**
+   * `alt`: The image alternative text.
+   */
   alt: React.PropTypes.string.isRequired,
-  data: React.PropTypes.shape({
+  /**
+   * `crop`: describes the way the image should be cropped. If zooming/pannig
+   * parameters are provided, then they'll be used as defaults.
+   */
+  crop: React.PropTypes.shape({
+    width: React.PropTypes.number.isRequired,
+    height: React.PropTypes.number.isRequired,
     scale: React.PropTypes.number,
     x: React.PropTypes.number,
     y: React.PropTypes.number,
-    width: React.PropTypes.number,
-    height: React.PropTypes.number,
-  }),
+  }).isRequired,
   /**
    * `onChange`: this callback will be called after each zoom or pan action.
    */
   onChange: React.PropTypes.func,
+  /**
+   * `showCropControls`: A flag that enables showing a couple crop controls to
+   * zoom in and out. Requires font awesome.
+   */
+  showCropControls: React.PropTypes.bool,
 }
 
 Guillotine.defaultProps = {
-  data: {
+  crop: {
     scale: 1,
     x: 0,
     y: 0,
-    width: 0,
-    hight: 0,
   },
 }
 

@@ -10,25 +10,23 @@ class App extends Component {
         <div className='react-guillotine-holder' style={{width: 150, height: 125}}>
           <Guillotine
             src='http://placekitten.com/600/600'
-            width={300}
-            height={250}
+            crop={{ width: 300, height: 250, }}
             alt="Something"
           />
         </div>
         <div className='react-guillotine-holder' style={{width: 500, height: 800}}>
           <Guillotine
-            src='http://lorempixel.com/1920/1080'
-            width={250}
-            height={400}
+            src='http://beerhold.it/800/600'
+            crop={{ width: 250, height: 400, scale: 3, }}
             alt="Narrow"
           />
         </div>
         <div className='react-guillotine-holder' style={{width: 300, height: 300}}>
           <Guillotine
             src='http://fillmurray.com/1300/1000'
-            width={600}
-            height={600}
+            crop={{ width: 600, height: 600, }}
             alt="Square"
+            onChange={console.log}
           />
         </div>
       </div>

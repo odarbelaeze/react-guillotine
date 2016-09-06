@@ -20,7 +20,8 @@ class ImageCrop extends Component {
   componentDidMount() {
     this.refs.image.onload = () => {
       let {naturalWidth, naturalHeight} = this.refs.image;
-      let {width, height, onImageLoad} = this.props;
+      let {width, height} = this.props.crop;
+      let {onImageLoad} = this.props;
       this.setState({
         widthRatio: naturalWidth / width,
         heightRatio: naturalHeight / height,
@@ -53,6 +54,13 @@ class ImageCrop extends Component {
             style={this.getImageStyles()}
           />
         </div>
+        {
+          this.props.showOverlay && (
+            <div className='image-crop-overlay'>
+              <i className='fa fa-crop' aria-hidden='true' />
+            </div>
+          )
+        }
       </div>
     );
   }
@@ -63,8 +71,7 @@ class ImageCrop extends Component {
 
   getWindowStyle() {
     return {
-      paddingTop: this._toPercent(this.props.height / this.props.width),
-
+      paddingTop: this._toPercent(this.props.crop.height / this.props.crop.width),
       // Why bother with a stylesheet at this point.
       position: 'relative',
       display: 'block',
@@ -81,7 +88,6 @@ class ImageCrop extends Component {
       height: this._toPercent(heightRatio * scale),
       left: this._toPercent(- x / width),
       top: this._toPercent(- y / height),
-
       // Why bother with a stylesheet at this point.
       position: 'absolute',
       textAlign: 'center',
@@ -137,6 +143,11 @@ ImageCrop.propTypes = {
    * element as parameters.
    */
   onImageLoad: React.PropTypes.func,
+  /**
+   * `showOverlay`: A boolean flag to enable a little overlay on the botom of the
+   * image. Requires font awesome.
+   */
+  showOverlay: React.PropTypes.bool,
 }
 
 ImageCrop.defaultProps = {
