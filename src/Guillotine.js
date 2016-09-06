@@ -133,7 +133,7 @@ class Guillotine extends Component {
   }
 
   zoomOut() {
-    this.setState(this.newScale(0.95));
+    this.setState(this.newScale(1.0 / 1.05));
     this.report();
   }
 
