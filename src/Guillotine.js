@@ -57,23 +57,21 @@ class Guillotine extends Component {
   render() {
     let {src, width, height, alt} = this.props;
     return (
-      <div className='react-guillotine-holder' style={{width, height}}>
+      <div
+        className='react-guillotine-window'
+        style={{paddingTop: (height/width*100) + '%'}}
+        ref='window'
+      >
         <div
-          className='react-guillotine-window'
-          style={{paddingTop: (height/width*100) + '%'}}
-          ref='window'
+          className='react-guillotine-canvas'
+          style={this.getCanvasStyles()}
         >
-          <div
-            className='react-guillotine-canvas'
-            style={this.getCanvasStyles()}
-          >
-            <img
-              ref='image'
-              src={src}
-              alt={alt}
-              style={this.getImgStyles()}
-            />
-          </div>
+          <img
+            ref='image'
+            src={src}
+            alt={alt}
+            style={this.getImgStyles()}
+          />
         </div>
       </div>
     );
@@ -85,12 +83,14 @@ class Guillotine extends Component {
     let minWidthScale = width / naturalWidth;
     let minHeightScale = height / naturalHeight;
     let minScale = minWidthScale > minHeightScale? minWidthScale : minHeightScale;
+    console.log(this.refs.window.clientWidth);
     this.setState({
       minScale,
       naturalWidth,
       naturalHeight,
       widthRatio: naturalWidth / width,
       heightRatio: naturalHeight / height,
+      clientScale: width / this.refs.window.clientWidth,
       scale: minScale,
       maxX: naturalWidth * minScale - this.props.width,
       maxY: naturalHeight * minScale - this.props.height,
@@ -118,18 +118,23 @@ class Guillotine extends Component {
   }
 
   pan(dx, dy) {
+    let scaledDx = dx * this.state.clientScale;
+    let scaledDy = dy * this.state.clientScale;
     this.setState({
-      x: this._clip(this.state.x + dx, 0, this.state.maxX),
-      y: this._clip(this.state.y + dy, 0, this.state.maxY),
+      x: this._clip(this.state.x + scaledDx, 0, this.state.maxX),
+      y: this._clip(this.state.y + scaledDy, 0, this.state.maxY),
     });
+    this.report();
   }
 
   zoomIn() {
     this.setState(this.newScale(1.05));
+    this.report();
   }
 
   zoomOut() {
     this.setState(this.newScale(0.95));
+    this.report();
   }
 
   handleWheel(evt) {
@@ -181,6 +186,18 @@ class Guillotine extends Component {
     }
   }
 
+  report() {
+    if (this.props.onChange) {
+      this.props.onChange({
+        scale: this.state.scale,
+        x: this.state.x,
+        y: this.state.y,
+        width: this.props.width,
+        height: this.props.height,
+      });
+    }
+  }
+
   /**
    * Helpers
    */
@@ -204,6 +221,10 @@ Guillotine.propTypes = {
     width: React.PropTypes.number,
     height: React.PropTypes.number,
   }),
+  /**
+   * `onChange`: this callback will be called after each zoom or pan action.
+   */
+  onChange: React.PropTypes.func,
 }
 
 Guillotine.defaultProps = {

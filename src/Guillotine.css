@@ -1,6 +1,7 @@
 .react-guillotine-holder {
     border: 1px dashed blue;
     margin: 10px;
+    display: inline-block;
 }
 
 .react-guillotine-window {
