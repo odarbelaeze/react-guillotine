@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import './Guillotine.css';
 import _ from 'lodash';
+import ImageCrop from './ImageCrop';
 
 
 class Guillotine extends Component {
@@ -12,6 +13,7 @@ class Guillotine extends Component {
     this.boundMouseDown = this.handleMouseDown.bind(this);
     this.boundMouseMove = this.handleMouseMove.bind(this);
     this.boundMouseUp = this.handleMouseUp.bind(this);
+    this.boundInitImage = this.initImage.bind(this);
   }
 
   localEvents() {
@@ -32,9 +34,9 @@ class Guillotine extends Component {
   }
 
   componentDidMount() {
-    this.refs.image.onload = this.initImage.bind(this);
+    let {crop} = this.refs;
     _.each(this.localEvents(), (listener, event) => {
-      this.refs.window.addEventListener(event, listener);
+      crop.refs.window.addEventListener(event, listener);
     });
     _.each(this.globalEvents(), (listener, event) => {
       window.addEventListener(event, listener);
@@ -42,8 +44,9 @@ class Guillotine extends Component {
   }
 
   componentWillUnmount() {
+    let crop = this.refs;
     _.each(this.localEvents, (listener, event) => {
-      this.refs.window.removeEventListener(event, listener);
+      crop.refs.window.removeEventListener(event, listener);
     });
     _.each(this.globalEvents(), (listener, event) => {
       window.removeEventListener(event, listener);
@@ -55,42 +58,27 @@ class Guillotine extends Component {
   }
 
   render() {
-    let {src, width, height, alt} = this.props;
     return (
-      <div
-        className='react-guillotine-window'
-        style={{paddingTop: (height/width*100) + '%'}}
-        ref='window'
-      >
-        <div
-          className='react-guillotine-canvas'
-          style={this.getCanvasStyles()}
-        >
-          <img
-            ref='image'
-            src={src}
-            alt={alt}
-            style={this.getImgStyles()}
-          />
-        </div>
-      </div>
+      <ImageCrop
+        crop={this.getCrop()}
+        onImageLoad={this.boundInitImage}
+        ref='crop'
+        {...this.props}
+      />
     );
   }
 
-  initImage() {
-    let { naturalWidth, naturalHeight } = this.refs.image;
+  initImage(image, cropWindow) {
+    let { naturalWidth, naturalHeight } = image;
     let { width, height } = this.props;
     let minWidthScale = width / naturalWidth;
     let minHeightScale = height / naturalHeight;
     let minScale = minWidthScale > minHeightScale? minWidthScale : minHeightScale;
-    console.log(this.refs.window.clientWidth);
     this.setState({
       minScale,
       naturalWidth,
       naturalHeight,
-      widthRatio: naturalWidth / width,
-      heightRatio: naturalHeight / height,
-      clientScale: width / this.refs.window.clientWidth,
+      clientScale: width / cropWindow.clientWidth,
       scale: minScale,
       maxX: naturalWidth * minScale - this.props.width,
       maxY: naturalHeight * minScale - this.props.height,
@@ -165,36 +153,19 @@ class Guillotine extends Component {
     this.setState({ panning: false, panningFrom: null });
   }
 
-  getCanvasStyles() {
+  getCrop() {
     return {
-      width: `${this.state.widthRatio * this.state.scale * 100}%`,
-      height: `${this.state.heightRatio * this.state.scale * 100}%`,
-      top:  `${- this.state.y / this.props.height * 100}%`,
-      left: `${- this.state.x / this.props.width * 100}%`,
-    };
-  }
-
-  getImgStyles() {
-    return {
-      width: '100%',
-      height: '100%',
-      top: '10%',
-      left: '10%',
-      perspective: '1000px',
-      backfaceVisibility: 'hidden',
-      visibility: 'visible',
+      scale: this.state.scale,
+      x: this.state.x,
+      y: this.state.y,
+      width: this.props.width,
+      height: this.props.height,
     }
   }
 
   report() {
     if (this.props.onChange) {
-      this.props.onChange({
-        scale: this.state.scale,
-        x: this.state.x,
-        y: this.state.y,
-        width: this.props.width,
-        height: this.props.height,
-      });
+      this.props.onChange(this.props.getCrop());
     }
   }
 
