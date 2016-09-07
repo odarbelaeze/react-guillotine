@@ -82,7 +82,7 @@ class ImageCrop extends Component {
 
   getCanvasStyles() {
     let { widthRatio, heightRatio, } = this.state;
-    let { x, y, width, height, scale, } = this.props.crop;
+    let { width, height, x = 0, y = 0, scale = 1, } = this.props.crop;
     return {
       width: this._toPercent(widthRatio * scale),
       height: this._toPercent(heightRatio * scale),
@@ -148,14 +148,6 @@ ImageCrop.propTypes = {
    * image. Requires font awesome.
    */
   showOverlay: React.PropTypes.bool,
-}
-
-ImageCrop.defaultProps = {
-  crop: {
-    scale: 1,
-    x: 0,
-    y: 0,
-  }
 }
 
 export default ImageCrop;

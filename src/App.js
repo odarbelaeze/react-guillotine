@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 
 import Guillotine from './Guillotine.js';
+import ImageCropper from './ImageCropper.js';
 
 class App extends Component {
   render() {
@@ -15,20 +16,24 @@ class App extends Component {
           />
         </div>
         <div className='react-guillotine-holder' style={{width: 500, height: 800}}>
-          <Guillotine
+          <ImageCropper
             src='http://beerhold.it/800/600'
             crop={{ width: 250, height: 400, scale: 3, }}
             alt="Narrow"
-            showOverlay
+            onUpdateCrop={console.log}
+            onStartCrop={_ => console.log('start crop')}
+            onEndCrop={_ => console.log('end crop')}
           />
         </div>
         <div className='react-guillotine-holder' style={{width: 300, height: 300}}>
-          <Guillotine
+          <ImageCropper
             src='http://fillmurray.com/1300/1000'
             crop={{ width: 600, height: 600, }}
             alt="Square"
-            onChange={console.log}
-            showCropControls
+            onUpdateCrop={console.log}
+            onStartCrop={_ => console.log('start crop')}
+            onEndCrop={_ => console.log('end crop')}
+            isCropping
           />
         </div>
       </div>
