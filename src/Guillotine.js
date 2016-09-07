@@ -13,6 +13,7 @@ class Guillotine extends Component {
     this.boundMouseDown = this.handleMouseDown.bind(this);
     this.boundMouseMove = this.handleMouseMove.bind(this);
     this.boundMouseUp = this.handleMouseUp.bind(this);
+    this.boundKeyDown = this.handleKeyDown.bind(this);
     this.boundInitImage = this.initImage.bind(this);
   }
 
@@ -30,6 +31,7 @@ class Guillotine extends Component {
       touchmove: this.boundMouseMove,
       touchend: this.boundMouseUp,
       mouseup: this.boundMouseUp,
+      keydown: this.boundKeyDown,
     }
   }
 
@@ -171,6 +173,12 @@ class Guillotine extends Component {
   handleMouseUp(evt) {
     evt.preventDefault();
     this.setState({ panning: false, panningFrom: null });
+  }
+
+  handleKeyDown(evt) {
+    evt.preventDefault();
+    if (evt.key === '-') this.zoomOut();
+    if (evt.key === '+' || evt.key === '=') this.zoomIn();
   }
 
   getCrop() {

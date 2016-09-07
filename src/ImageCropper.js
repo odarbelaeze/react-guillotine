@@ -49,7 +49,7 @@ class ImageCropper extends Component {
   }
 
   handleKeyDown(evt) {
-    console.log('from the cropper', evt);
+    if (evt.key === 'Enter') this.props.onEndCrop();
   }
 
   handleMouseDown(evt) {
